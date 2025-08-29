@@ -1,0 +1,16 @@
+[project]
+name = "PL_QA_Rag_with_Bielik"
+requires-python = ">=3.10"
+readme = "README.md"
+keywords = ["rag", "bielik"]
+    [project.urls]
+    "Homepage" = "https://github.com/matkrol13/"
+
+[ollama]
+model="SpeakLeash/bielik-11b-v2.2-instruct"
+api="http://localhost:11454/api/chat"  # Beware this is not default port for ollama, update if needed
+system_prompt="Odpowiedz zwięźle na pytanie na podstawie tekstu: "
+
+[data]
+setup_script="process_text.py"
+database_timeout=50  # seconds
