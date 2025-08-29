@@ -35,9 +35,11 @@ def chunks_to_embeddings(embedder: SentenceTransformer, text_chunks: list[str]):
     """
     return [embedder.encode(chunk, chunk_size=512) for chunk in text_chunks]
 
-if "__main__" == __name__:
+def create_database(data_path: str) -> chromadb.PersistentClient:
+    """Generates embeddings for text files inside data directory. Since chromadb Persistent client lacks closing method,
+    a workaround needs to be implemented; thus this function returns the client"""
     text_chunks = []
-    text_files = [file_ for file_ in os.scandir("./docs/") if file_.name.endswith(".txt")]
+    text_files = [file_ for file_ in os.scandir(data_path) if file_.name.endswith(".txt")]
     for file_ in text_files:
         with open(file_.path, "r", encoding='utf-8') as f:
             # Provided text files contained control characters, which deeply polluted the context
@@ -52,9 +54,15 @@ if "__main__" == __name__:
         )
     embeddings = model.encode(text_chunks, convert_to_numpy=True)
 
-    client = chromadb.PersistentClient(path="./docs/")
+    client = chromadb.PersistentClient(path=data_path)
     collection = client.get_or_create_collection(name="bielik_rag", metadata={"hnsw:space": "cosine"})
     collection.add(ids=[str(i) for i in range(len(text_chunks))], documents=text_chunks, embeddings=embeddings)
+
+    return client
+
+if "__main__" == __name__:
+    _ = create_database("./docs/")
+
 
 
 

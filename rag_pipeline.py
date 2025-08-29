@@ -1,36 +1,24 @@
 import os.path
 import chromadb
 import requests
-import subprocess
 import sys
 from sentence_transformers import SentenceTransformer
 
 try: import tomllib
 except ModuleNotFoundError: import tomli as tomllib
 
+from process_text import create_database
+
 if "__main__" == __name__:
     with open("pyproject.toml", mode="rb") as fp:
         args = tomllib.load(fp)
 
+    print("Wczytywanie danych...")
     if not os.path.exists('./data/chroma.sqlite3'):
         print("Nie znaleziono bazy danych, tworzenie osadzeń plików txt w ./data/ ...")
-        proc = subprocess.Popen(args=["python3", "process_text.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        try:
-            command, timeout = ["python3", args["data"]["setup_script"]], args["data"]["setup_timeout"]
-            result = subprocess.run(args=command, timeout=timeout)
-            print("OK! Baza utworzona.")
-
-        except subprocess.CalledProcessError as e:
-            print("Tworzenie bazy danych zakończone niepowodzeniem, błąd: ", e.returncode, e.stderr)
-            sys.exit(-1)
-
-        except subprocess.TimeoutExpired as e:
-            print(f"Nie udało się utworzyć bazy w ciągu {args['data']['database_timeout']}s, przerywanie programu...")
-            sys.exit(-1)
-
-    print("Wczytywanie danych...")
-    client = chromadb.PersistentClient(path="./data")
+        client = create_database("./data/")
+    else:
+        client = chromadb.PersistentClient(path="./data")
     collection = client.get_collection(name="bielik_rag")
 
     print("Wczytywanie tokenizera...\n")

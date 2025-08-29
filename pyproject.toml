@@ -13,4 +13,4 @@ system_prompt="Odpowiedz zwięźle na pytanie na podstawie tekstu: "
 
 [data]
 setup_script="process_text.py"
-database_timeout=50  # seconds
+setup_timeout=50  # seconds

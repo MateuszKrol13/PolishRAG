@@ -1,3 +1,2 @@
-chromadb
-numpy
-sentence-transformers
+chromadb>=1.0.20
+sentence-transformers>=5.1.0
